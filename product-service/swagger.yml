@@ -1,0 +1,65 @@
+---
+swagger: "2.0"
+info:
+  description: "Nodejs in AWS API"
+  version: "2021-08-15T20:16:38Z"
+  title: "product-service-dev"
+host: "cyhjewb686.execute-api.eu-central-1.amazonaws.com"
+basePath: "/dev"
+schemes:
+- "https"
+paths:
+  /products:
+    get:
+      summary: "Gets a simple message"
+      description: "Demonstrates a GET method. You can see query string parameters,\
+        \ request headers, response body and response headers.\n"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/ProductsResponse"
+  /products/{id}:
+    get:
+      summary: "Gets a simple message"
+      description: "Demonstrates a GET method. You can see query string parameters,\
+        \ request headers, response body and response headers.\n"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/ProductResponse"
+        "404":
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/404JsonResponse"
+definitions:
+  ProductResponse:
+    type: "object"
+    properties:
+      price:
+        type: "number"
+      description:
+        type: "string"
+      id:
+        type: "string"
+      title:
+        type: "string"
+  "404JsonResponse":
+    type: "object"
+    properties:
+      message:
+        type: "string"
+  ProductsResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/ProductResponse"

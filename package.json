@@ -1,0 +1,23 @@
+{
+  "name": "aws-shop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy:be": "cd product-service && sls deploy",
+    "deploy:fe": "cd nodejs-aws-fe && npm run cloudfront:build:deploy",
+    "swagger": "cd product-service && npm run swagger"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akrukovich/aws-shop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akrukovich/aws-shop/issues"
+  },
+  "homepage": "https://github.com/akrukovich/aws-shop#readme"
+}
