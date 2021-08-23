@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import getProductsList from '@functions/getProductsList';
 import getProductById from '@functions/getProductById';
+import createProduct from '@functions/createProduct';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -36,6 +37,30 @@ const serverlessConfiguration: AWS = {
                 type: 'string',
               },
               price: {
+                type: 'number',
+              },
+              count: {
+                type: 'number',
+              },
+            },
+          },
+        },
+        {
+          name: 'ProductCreate',
+          contentType: 'application/json',
+          schema: {
+            type: 'object',
+            properties: {
+              title: {
+                type: 'string',
+              },
+              description: {
+                type: 'string',
+              },
+              price: {
+                type: 'number',
+              },
+              count: {
                 type: 'number',
               },
             },
@@ -77,11 +102,16 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      DB_USER_AWS: process.env.DB_USER_AWS,
+      DB_HOST_AWS: process.env.DB_HOST_AWS,
+      DB_NAME_AWS: process.env.DB_NAME_AWS,
+      DB_PASSWORD_AWS: process.env.DB_PASSWORD_AWS,
+      DB_PORT_AWS: process.env.DB_PORT_AWS,
     },
     lambdaHashingVersion: '20201221',
   },
   // import the function via paths
-  functions: { getProductsList, getProductById },
+  functions: { getProductsList, getProductById, createProduct },
 };
 
 module.exports = serverlessConfiguration;

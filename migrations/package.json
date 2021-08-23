@@ -1,0 +1,18 @@
+{
+  "name": "migrations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "create": "node create-tables.js",
+    "drop": "node drop-tables.js",
+    "populate": "node populate-tables.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "8.7.1",
+    "pg-format": "1.0.4"
+  }
+}

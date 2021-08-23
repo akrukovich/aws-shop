@@ -1,10 +1,12 @@
+import { APIGatewayEvent } from 'aws-lambda';
 import formatJSONResponse from '@libs/apiGateway';
 import { ProductsService } from '../../services';
 import DataBaseClient from '../../services/db-client.service';
 
-const getProductsList = async () => {
+const createProduct = async (event: APIGatewayEvent) => {
   const productService = new ProductsService(DataBaseClient.getClient());
-  return formatJSONResponse(await productService.getProducts());
+  const body = event.body as any;
+  return formatJSONResponse(await productService.createProduct(body));
 };
 
-export default getProductsList;
+export default createProduct;

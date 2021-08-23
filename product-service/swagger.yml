@@ -2,7 +2,7 @@
 swagger: "2.0"
 info:
   description: "Nodejs in AWS API"
-  version: "2021-08-15T20:16:38Z"
+  version: "2021-08-23T18:34:29Z"
   title: "product-service-dev"
 host: "cyhjewb686.execute-api.eu-central-1.amazonaws.com"
 basePath: "/dev"
@@ -11,9 +11,8 @@ schemes:
 paths:
   /products:
     get:
-      summary: "Gets a simple message"
-      description: "Demonstrates a GET method. You can see query string parameters,\
-        \ request headers, response body and response headers.\n"
+      summary: "Get products list"
+      description: "Return the whole list of products"
       produces:
       - "application/json"
       responses:
@@ -21,11 +20,43 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/ProductsResponse"
+    post:
+      summary: "Post a new single product"
+      description: "Create a new product"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ProductCreate"
+        required: true
+        schema:
+          $ref: "#/definitions/ProductCreate"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/ProductResponse"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
   /products/{id}:
     get:
-      summary: "Gets a simple message"
-      description: "Demonstrates a GET method. You can see query string parameters,\
-        \ request headers, response body and response headers.\n"
+      summary: "Get one single product"
+      description: "Return one product by Id"
       produces:
       - "application/json"
       parameters:
@@ -43,10 +74,23 @@ paths:
           schema:
             $ref: "#/definitions/404JsonResponse"
 definitions:
+  ProductCreate:
+    type: "object"
+    properties:
+      price:
+        type: "number"
+      count:
+        type: "number"
+      description:
+        type: "string"
+      title:
+        type: "string"
   ProductResponse:
     type: "object"
     properties:
       price:
+        type: "number"
+      count:
         type: "number"
       description:
         type: "string"

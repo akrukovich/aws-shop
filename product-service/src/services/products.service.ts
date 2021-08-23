@@ -1,75 +1,69 @@
 import { NotFound } from 'http-errors';
-import { Product } from '../archetypes/interfaces';
+import { Client } from 'pg';
+import { Product, Stock } from '../archetypes/interfaces';
 
-export const PRODUCTS: Product[] = [
-  {
-    description: 'Short Product Description1',
-    id: '7567ec4b-b10c-48c5-9345-fc73c48a80aa',
-    price: 2.4,
-    title: 'ProductOne',
-  },
-  {
-    description: 'Short Product Description3',
-    id: '7567ec4b-b10c-48c5-9345-fc73c48a80a0',
-    price: 10,
-    title: 'ProductNew',
-  },
-  {
-    description: 'Short Product Description2',
-    id: '7567ec4b-b10c-48c5-9345-fc73c48a80a2',
-    price: 23,
-    title: 'ProductTop',
-  },
-  {
-    description: 'Short Product Description7',
-    id: '7567ec4b-b10c-48c5-9345-fc73c48a80a1',
-    price: 15,
-    title: 'ProductTitle',
-  },
-  {
-    description: 'Short Product Description2',
-    id: '7567ec4b-b10c-48c5-9345-fc73c48a80a3',
-    price: 23,
-    title: 'Product',
-  },
-  {
-    description: 'Short Product Description4',
-    id: '7567ec4b-b10c-48c5-9345-fc73348a80a1',
-    price: 15,
-    title: 'ProductTest',
-  },
-  {
-    description: 'Short Product Descriptio1',
-    id: '7567ec4b-b10c-48c5-9445-fc73c48a80a2',
-    price: 23,
-    title: 'Product2',
-  },
-  {
-    description: 'Short Product Description7',
-    id: '7567ec4b-b10c-45c5-9345-fc73c48a80a1',
-    price: 15,
-    title: 'ProductName',
-  },
-];
+export type ProductsStocksQuery = Product & Stock;
 
 class ProductsService {
-  private products: Product[];
+  private db: Client;
 
-  constructor() {
-    this.products = PRODUCTS;
+  constructor(client: Client) {
+    this.db = client;
   }
 
-  async getProducts(): Promise<Product[]> {
-    return this.products;
+  async getProducts(): Promise<ProductsStocksQuery[]> {
+    await this.db.connect();
+    const { rows } = await this.db.query(`SELECT products.id,products.title,products.description,products.price,stocks.count
+    FROM products
+    INNER JOIN stocks ON products.id=stocks.product_id;`);
+
+    await this.db.end();
+
+    return rows;
   }
 
-  async getProductById(productId: string): Promise<Product> {
-    const product = this.products.find(({ id }) => id === productId);
+  async getProductById(productId: string): Promise<ProductsStocksQuery> {
+    await this.db.connect();
+    const { rows: [product] } = await this.db.query(`SELECT products.id,products.title,products.description,products.price,stocks.count
+    FROM products
+    INNER JOIN stocks ON products.id=stocks.product_id
+    Where products.id::text = '${productId}';
+    `);
+
+    await this.db.end();
+
     if (!product) {
       throw new NotFound(`product with id: ${productId} not found`);
     }
 
     return product;
+  }
+
+  async createProduct({
+    title, description, price, count,
+  }: ProductsStocksQuery): Promise<ProductsStocksQuery> {
+    await this.db.connect();
+    try {
+      await this.db.query('BEGIN');
+
+      const queryProductText = 'INSERT INTO products (title, description, price) VALUES($1,$2,$3) RETURNING id, title, description, price';
+      const { rows: [product] } = await this.db.query(
+        queryProductText,
+        [title, description, price],
+      );
+
+      const insertStocksText = 'INSERT INTO stocks(product_id, count) VALUES ($1, $2) RETURNING count';
+      await this.db.query(insertStocksText, [product.id, count]);
+
+      await this.db.query('COMMIT');
+
+      return { ...product, count };
+    } catch (e) {
+      await this.db.query('ROLLBACK');
+      throw e;
+    } finally {
+      await this.db.end();
+    }
   }
 }
 
